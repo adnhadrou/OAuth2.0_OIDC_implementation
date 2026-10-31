@@ -1,0 +1,16 @@
+.venv
+.git
+.local
+.env
+.env.*
+.idea
+.ruff_cache
+*.pem
+*.key
+*.p12
+*.pfx
+__pycache__
+.pytest_cache
+.hypothesis
+test-results
+

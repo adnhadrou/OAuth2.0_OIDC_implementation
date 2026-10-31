@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}AuthFlow Lab{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="masthead">
+      <span class="brand">AuthFlow Lab</span>
+      <span class="environment">LOCAL DEMO</span>
+    </header>
+    <main>{% block content %}{% endblock %}</main>
+    <footer>Educational OAuth/OIDC project. Synthetic accounts only.</footer>
+  </div>
+</body>
+</html>

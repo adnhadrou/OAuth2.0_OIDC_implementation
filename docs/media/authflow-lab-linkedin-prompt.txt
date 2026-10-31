@@ -1,0 +1,38 @@
+Use case: infographic-diagram.
+Create a polished, publication-ready technical infographic for a cybersecurity student's LinkedIn portfolio, explaining their actual project AuthFlow Lab. One high-resolution portrait image, approximately 4:5 aspect ratio. This is a professional protocol architecture graphic, not an app screenshot. Precision of arrow direction and text is essential.
+
+STYLE: restrained editorial technical design, off-white canvas, very dark navy text, teal OAuth accent, violet OIDC accent, subtle fine grey dividers. Crisp flat vector-like line work, minimal outline icons, generous whitespace, strong hierarchy, large readable sans-serif typography. No 3D, no hacker imagery, no decorative circuit boards, no photographic objects, no external company logos. All content comfortably within safe margins.
+
+TOP HEADER, exact copy:
+"AUTHFLOW LAB"
+"OAuth 2.0 + OpenID Connect"
+"Protocol implementation & security testing"
+
+MAIN GRAPH: clean simplified sequence diagram with FOUR clearly separated columns in this exact left-to-right order:
+"Browser", "Web Client", "Authorization Server", "Protected API".
+The Authorization Server label may wrap to two lines. Each column has a small relevant outline icon and a faint vertical lifeline. Emphasize the confidential server-side web client, not a JavaScript client. Put readable numbered messages on separate horizontal rows with generous vertical spacing. Each message arrow must connect exactly the specified lifelines, with a clear arrowhead at the receiving lifeline; avoid crossing labels. Exact message content and direction:
+1. Web Client -> Authorization Server: "1  Authorization request + S256 challenge" with smaller "(via browser)" on a second line.
+2. Browser -> Authorization Server: "2  Login + consent".
+3. Authorization Server -> Web Client: "3  Authorization code" with smaller "(via browser)".
+4. Web Client -> Authorization Server: "4  Code + verifier + client authentication".
+5. Authorization Server -> Web Client: "5  ID token + access token".
+6. Web Client -> Protected API: "6  Access token + scope check".
+7. Protected API -> Web Client: "7  Protected data".
+Keep these arrows technically correct. The Browser must never receive the issued access token or ID token; those go server-to-server to the Web Client. The ID token must never be sent to the API. Prefer wrap labels over shrinking them excessively. Put the main diagram in the central generous area of the image.
+
+BELOW GRAPH: two distinct compact concept cards side by side, exact text:
+Teal card: "OAuth 2.0" / "Authorization" / "Access token -> API"
+Violet card: "OpenID Connect" / "Authentication" / "ID token -> Client"
+Use drawn arrows instead of the ASCII -> symbol inside these card labels.
+
+BELOW CARDS: a short clearly legible security strip with heading:
+"Security checks"
+And these five concise items, arranged cleanly across two rows if needed:
+"S256 PKCE" / "State + nonce" / "Atomic code redemption" / "JWT validation" / "Scope enforcement".
+A small subline: "Replay and token-substitution tests"
+
+BOTTOM FOOTER:
+"Python • Flask • PostgreSQL • pytest • Docker"
+"Educational implementation • Documented OAuth/OIDC subset"
+
+CONSTRAINTS: render the quoted text correctly, do not add claims of production readiness or OIDC certification, no invented test counts, no CVE claims, no credentials, no author name, no watermark. The primary visual emphasis must be OAuth/OIDC and secure protocol flow; technologies are secondary. Prioritize conceptual clarity and legibility over decoration. Deliver one complete, beautiful image.

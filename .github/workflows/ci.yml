@@ -1,0 +1,35 @@
+name: protocol-and-security
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: pip
+          cache-dependency-path: requirements.lock
+      - run: pip install -r requirements.lock
+      - run: ruff check . && ruff format --check .
+      - run: pip-audit -r requirements.lock --progress-spinner off
+      - run: python scripts/bootstrap.py
+      - run: docker compose up -d --build
+      - run: docker compose --profile test run --build --rm tests
+      - if: always()
+        run: |
+          if test -f test-results/results.xml; then
+            python scripts/report.py test-results/results.xml --output test-results/sanitized.md
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sanitized-test-results
+          path: test-results/sanitized.md
+          if-no-files-found: ignore
+      - if: always()
+        run: docker compose down -v
+

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Protected notes · AuthFlow Lab{% endblock %}
+{% block content %}
+  <p class="step">DEMO COMPLETE</p>
+  <h1>Protected notes</h1>
+  <p class="intro">The API accepted your access token and permission to read notes.</p>
+  <ul class="notes">{% for note in notes %}<li>{{ note }}</li>{% endfor %}</ul>
+  <a href="/">Return to the client</a>
+{% endblock %}

@@ -1,0 +1,18 @@
+[project]
+name = "authflow-lab"
+version = "0.1.0"
+description = "Educational OAuth/OIDC implementation and security tests"
+requires-python = ">=3.13,<3.15"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = ["browser: requires running HTTPS stack and Chromium", "integration: requires PostgreSQL"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+

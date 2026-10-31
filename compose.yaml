@@ -1,0 +1,102 @@
+name: authflow-lab
+x-app: &app
+  build:
+    context: .
+    target: app
+  volumes:
+    - ./.local:/lab/.local:ro
+  environment: &env
+    DATABASE_URL: postgresql+psycopg://lab:${POSTGRES_PASSWORD:?Run bootstrap first}@db:5432/authflow
+    NO_PROXY: .authflow.test,db,127.0.0.1,localhost
+  depends_on:
+    migrate:
+      condition: service_completed_successfully
+  restart: unless-stopped
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: lab
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run bootstrap first}
+      POSTGRES_DB: authflow
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/10-test.sql:ro
+    ports:
+      - "127.0.0.1:55432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lab -d authflow"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  migrate:
+    build:
+      context: .
+      target: app
+    environment: *env
+    volumes:
+      - ./.local:/lab/.local:ro
+    command: ["sh", "-c", "alembic upgrade head && python -m authflow.seed"]
+    depends_on:
+      db:
+        condition: service_healthy
+  auth:
+    <<: *app
+    volumes:
+      - ./.local/secrets.json:/lab/.local/secrets.json:ro
+      - ./.local/signing-key.pem:/lab/.local/signing-key.pem:ro
+      - ./.local/signing-public.pem:/lab/.local/signing-public.pem:ro
+      - ./.local/ca.pem:/lab/.local/ca.pem:ro
+    environment:
+      <<: *env
+      LAB_SERVICE: auth
+  client:
+    <<: *app
+    volumes:
+      - ./.local/client.json:/lab/.local/client.json:ro
+      - ./.local/signing-public.pem:/lab/.local/signing-public.pem:ro
+      - ./.local/ca.pem:/lab/.local/ca.pem:ro
+    environment:
+      <<: *env
+      LAB_SERVICE: client
+  api:
+    <<: *app
+    volumes:
+      - ./.local/signing-public.pem:/lab/.local/signing-public.pem:ro
+      - ./.local/ca.pem:/lab/.local/ca.pem:ro
+    environment:
+      <<: *env
+      LAB_SERVICE: api
+  gateway:
+    image: caddy:2
+    ports:
+      - "127.0.0.1:8443:8443"
+      - "127.0.0.1:8444:8444"
+      - "127.0.0.1:8445:8445"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./.local/server-cert.pem:/certs/server-cert.pem:ro
+      - ./.local/server-key.pem:/certs/server-key.pem:ro
+    networks:
+      default:
+        aliases: [auth.authflow.test, client.authflow.test, api.authflow.test]
+    depends_on: [auth, client, api]
+  tests:
+    profiles: [test]
+    build:
+      context: .
+      target: test
+    environment:
+      TEST_DATABASE_URL: postgresql+psycopg://lab:${POSTGRES_PASSWORD}@db:5432/authflow_test
+      RUN_BROWSER: "1"
+      REQUESTS_CA_BUNDLE: /lab/.local/ca.pem
+      NO_PROXY: auth.authflow.test,client.authflow.test,api.authflow.test,db
+    volumes:
+      - ./.local:/lab/.local:ro
+      - ./test-results:/lab/test-results
+    depends_on:
+      - gateway
+volumes:
+  pgdata:
+

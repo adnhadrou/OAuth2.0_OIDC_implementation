@@ -1,0 +1,21 @@
+{
+    admin off
+    auto_https off
+    # No access log. Runtime errors are suppressed to avoid logging upstream URLs.
+    log default {
+        output discard
+    }
+}
+https://auth.authflow.test:8443 {
+    tls /certs/server-cert.pem /certs/server-key.pem
+    reverse_proxy auth:8000
+}
+https://client.authflow.test:8444 {
+    tls /certs/server-cert.pem /certs/server-key.pem
+    reverse_proxy client:8000
+}
+https://api.authflow.test:8445 {
+    tls /certs/server-cert.pem /certs/server-key.pem
+    reverse_proxy api:8000
+}
+
